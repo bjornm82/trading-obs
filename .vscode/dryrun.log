@@ -1,0 +1,30 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/bjornmooijekind/Projects/go/src/github.com/bjornm82/trading-obs'
+/Library/Developer/CommandLineTools/usr/bin/make deps
+ 
+make[1]: Entering directory `/Users/bjornmooijekind/Projects/go/src/github.com/bjornm82/trading-obs'
+go mod tidy
+make[1]: Leaving directory `/Users/bjornmooijekind/Projects/go/src/github.com/bjornm82/trading-obs'
+ 
+/Library/Developer/CommandLineTools/usr/bin/make build
+ 
+fatal: not a git repository (or any of the parent directories): .git
+
+fatal: not a git repository (or any of the parent directories): .git
+
+fatal: not a git repository (or any of the parent directories): .git
+
+make[1]: Entering directory `/Users/bjornmooijekind/Projects/go/src/github.com/bjornm82/trading-obs'
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -installsuffix cgo -o bin/go-trading-obs -a -tags netgo -ldflags "-w -X main.Version= -X main.COMMIT= -X main.BRANCH=" .
+ 
+make[1]: Leaving directory `/Users/bjornmooijekind/Projects/go/src/github.com/bjornm82/trading-obs'
+ 
+/Library/Developer/CommandLineTools/usr/bin/make run
+ 
+make[1]: Entering directory `/Users/bjornmooijekind/Projects/go/src/github.com/bjornm82/trading-obs'
+docker-compose up --build
+ 
+make[1]: Leaving directory `/Users/bjornmooijekind/Projects/go/src/github.com/bjornm82/trading-obs'
+ 
+make: Leaving directory `/Users/bjornmooijekind/Projects/go/src/github.com/bjornm82/trading-obs'
+ 

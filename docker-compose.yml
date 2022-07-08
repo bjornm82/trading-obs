@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  trading_obs:
+    build: .
+    container_name: trading_obs
+    environment:
+      OANDA_API_URL: "https://api-fxpractice.oanda.com"
+      OANDA_STREAM_API_URL: "https://stream-fxpractice.oanda.com/"
+      OANDA_TOKEN: "a7f4f34b8f41a1d1d467047517c9b8a0-73ef8ea2c18a28fbb89c0fc21786b9b9"
+      OANDA_ACCOUNT: "101-004-8979399-001"
+      OANDA_APPLICATION: "OBS DAX"
+      OANDA_BACKTEST: "true"
+    command: ./go-trading-obs obsDax
+  orderer:
+    build: .
+    container_name: orderer
+    environment:
+      OANDA_API_URL: "https://api-fxpractice.oanda.com"
+      OANDA_STREAM_API_URL: "https://stream-fxpractice.oanda.com/"
+      OANDA_TOKEN: "a7f4f34b8f41a1d1d467047517c9b8a0-73ef8ea2c18a28fbb89c0fc21786b9b9"
+      OANDA_ACCOUNT: "101-004-8979399-001"
+      OANDA_APPLICATION: "OBS DAX"
+      OANDA_BACKTEST: "true"
+      # MINUTES: 120
+      DATE_FROM: "2022-07-05T09:00:00"
+    command: ./go-trading-obs orderer

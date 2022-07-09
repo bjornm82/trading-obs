@@ -5,8 +5,8 @@ import "time"
 type BrokerManager interface {
 	GetOrders() (OrdersResponse, error)
 	GetPendingOrders() (PendingOrdersResponse, error)
-	CreateOrder(units int, instrument, order_type string) (OrderResponse, error)
-	CreateSlTpMarketOrder(units int, instrument string, price, sl, tp float64) (OrderResponse, error)
+	CreateOrder(units float64, instrument, order_type string) (OrderResponse, error)
+	CreateSlTpMarketOrder(units float64, instrument string, price, sl, tp float64) (OrderResponse, error)
 	GetOpenTrades() (OpenTradesResponse, error)
 	GetPosition(instrument string) (PositionResponse, error)
 	GetPositions() (PositionsResponse, error)
@@ -15,7 +15,8 @@ type BrokerManager interface {
 	PutSLToBreakEven(price, order_id, trade_id string) (UpdateOrderResponse, error)
 	GetCandles(instrument string, count int, granularity string) (CandlesResponse, error)
 	GetPreciseCandles(instrument string, date_from, date_to time.Time, granularity string) (CandlesResponse, error)
-	TickStream(instruments []string, tchan chan Tick, end chan bool)
+	TickStream(instruments []string, tchan chan Tick, done chan bool)
+	GetSemiPriceStream(instrument []string) (SemiTick, error)
 }
 
 type Repo struct {

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
+	"math"
 	"time"
 )
 
@@ -40,7 +42,7 @@ const (
 // https://api-fxpractice.oanda.com/v3/accounts/101-004-8979399-001/trades/512/orders
 // {"takeProfit":{"price":"7095.9"}}
 
-func (r *Repo) CreateOrder(units int, instrument, order_type string) (OrderResponse, error) {
+func (r *Repo) CreateOrder(units float64, instrument, order_type string) (OrderResponse, error) {
 	resp := OrderResponse{}
 
 	if instrument == "" {
@@ -49,7 +51,7 @@ func (r *Repo) CreateOrder(units int, instrument, order_type string) (OrderRespo
 
 	o := OrderPayload{
 		Order: OrderBody{
-			Units:        units,
+			Units:        fmt.Sprintf("%.1f", units),
 			Instrument:   instrument,
 			TimeInForce:  "FOK",
 			Type:         order_type,
@@ -76,7 +78,16 @@ func (r *Repo) CreateOrder(units int, instrument, order_type string) (OrderRespo
 	return resp, err
 }
 
-func (r *Repo) CreateSlTpMarketOrder(units int, instrument string, price, sl, tp float64) (OrderResponse, error) {
+func round(num float64) int {
+	return int(num + math.Copysign(0.5, num))
+}
+
+func toFixed(num float64, precision int) float64 {
+	output := math.Pow(10, float64(precision))
+	return float64(round(num*output)) / output
+}
+
+func (r *Repo) CreateSlTpMarketOrder(units float64, instrument string, price, sl, tp float64) (OrderResponse, error) {
 	resp := OrderResponse{}
 
 	if instrument == "" {
@@ -87,11 +98,13 @@ func (r *Repo) CreateSlTpMarketOrder(units int, instrument string, price, sl, tp
 		Order: OrderBody{
 			Instrument:       instrument,
 			Type:             "MARKET",
-			Units:            units,
-			StopLossOnFill:   &OnFill{Price: fmt.Sprintf("%.2f", sl)},
-			TakeProfitOnFill: &OnFill{Price: fmt.Sprintf("%.2f", tp)},
+			Units:            fmt.Sprintf("%.1f", units),
+			StopLossOnFill:   &OnFill{Price: fmt.Sprintf("%.1f", sl)},
+			TakeProfitOnFill: &OnFill{Price: fmt.Sprintf("%.1f", tp)},
 		},
 	}
+	v, _ := json.Marshal(o)
+	log.Println(string(v))
 
 	b, err := json.Marshal(o)
 	if err != nil {
@@ -166,7 +179,7 @@ type UpdateOrderResponse struct {
 		Time                    time.Time `json:"time"`
 		Type                    string    `json:"type"`
 		TradeID                 string    `json:"tradeID"`
-		TimeInForce             string    `json:"timeInForce"`
+		TimeInForce             string    `json:"timeInForce,omitempty"`
 		TriggerCondition        string    `json:"triggerCondition"`
 		TriggerMode             string    `json:"triggerMode"`
 		Price                   string    `json:"price"`
@@ -195,7 +208,7 @@ type OrdersResponse struct {
 		Type             string    `json:"type"`
 		TradeID          string    `json:"tradeID"`
 		Price            string    `json:"price"`
-		TimeInForce      string    `json:"timeInForce"`
+		TimeInForce      string    `json:"timeInForce,omitempty"`
 		TriggerCondition string    `json:"triggerCondition"`
 		TriggerMode      string    `json:"triggerMode,omitempty"`
 		State            string    `json:"state"`
@@ -219,13 +232,13 @@ type PendingOrdersResponse struct {
 		Price            string    `json:"price"`
 		ReplacesOrderID  string    `json:"replacesOrderID,omitempty"`
 		State            string    `json:"state"`
-		TimeInForce      string    `json:"timeInForce"`
+		TimeInForce      string    `json:"timeInForce,omitempty"`
 		TriggerCondition string    `json:"triggerCondition"`
 		Type             string    `json:"type"`
 		Units            string    `json:"units,omitempty"`
 		StopLossOnFill   struct {
 			Price       string `json:"price"`
-			TimeInForce string `json:"timeInForce"`
+			TimeInForce string `json:"timeInForce,omitempty"`
 		} `json:"stopLossOnFill,omitempty"`
 		TradeID string `json:"tradeID,omitempty"`
 	} `json:"orders"`
@@ -283,9 +296,9 @@ type OnFill struct {
 }
 
 type OrderBody struct {
-	Units            int              `json:"units"`
+	Units            string           `json:"units"`
 	Instrument       string           `json:"instrument"`
-	TimeInForce      string           `json:"timeInForce"`
+	TimeInForce      string           `json:"timeInForce,omitempty"`
 	Type             string           `json:"type"`
 	PositionFill     string           `json:"positionFill,omitempty"`
 	Price            string           `json:"price,omitempty"`
@@ -308,7 +321,7 @@ type OrderResponse struct {
 		PositionFill string    `json:"positionFill"`
 		Reason       string    `json:"reason"`
 		Time         time.Time `json:"time"`
-		TimeInForce  string    `json:"timeInForce"`
+		TimeInForce  string    `json:"timeInForce,omitempty"`
 		Type         string    `json:"type"`
 		Units        string    `json:"units"`
 		UserID       int       `json:"userID"`
